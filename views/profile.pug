@@ -7,8 +7,36 @@ block content
       if user.Followings
         for following in user.Followings
           div= following.nick
+          input.twit-id(type='hidden' value=following.id)
+          button.cutter-follow 팔로잉 끊기
     .followers.half
       h2 팔로워 목록
       if user.Followers
         for follower in user.Followers
           div= follower.nick
+  
+  script.
+   [].forEach.call(document.querySelectorAll('.cutter-follow'), function (tag) {
+      tag.addEventListener('click', function () {
+        var isLoggedIn = document.querySelector('#my-id');
+        if (isLoggedIn) {
+          var userId = tag.parentNode.querySelector('.twit-id').value;
+          console.log(userId);
+          var myId = isLoggedIn.value;
+          if (userId !== myId) {
+            if (confirm('팔로잉의 끊겠습니까?')) {
+              var xhr = new XMLHttpRequest();
+              xhr.onload = function () {           
+                if (xhr.status === 200) {
+                  location.reload();
+                } else {
+                  console.error(xhr.responseText);
+                }
+              };
+              xhr.open('DELETE', '/user/' + userId + '/cutter');
+              xhr.send();
+            }
+          }
+        }
+      });
+    });
